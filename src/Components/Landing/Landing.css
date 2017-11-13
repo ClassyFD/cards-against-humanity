@@ -1,0 +1,78 @@
+.landing_main {
+  height: 100vh;
+  width: 100vw;
+  background: #232323;
+  position: absolute;
+  left: 0;
+  overflow: hidden;
+}
+.landing_section {
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  align-items: center;
+  height: 100vh;
+}
+.landing_left_container {
+  color: white;
+  height: 55vh;
+  width: 27vw;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  justify-content: space-around;
+  text-align: left;
+}
+.landing_title {
+  font-size: 85px;
+  line-height: 85px;
+  font-weight: 900;
+  display: flex;
+  flex-direction: column;
+}
+.landing_subtitle {
+  opacity: 0;
+  font-size: 30px;
+}
+.landing_right_container {
+  height: 100vh;
+  width: 50vw;
+  background: white;
+}
+#landing_black_card_1, #landing_black_card_2, #landing_black_card_3 {
+  position: absolute;
+  bottom: -400px;
+  right: 250px;
+  transform: rotate(270deg)
+}
+#landing_white_card_1, #landing_white_card_2, #landing_white_card_3, #landing_white_card_4,  #landing_white_card_5, #landing_white_card_6,  #landing_white_card_7,  #landing_white_card_8,  #landing_white_card_9,  #landing_white_card_10,  #landing_white_card_11, #landing_white_card_12 {
+  position: absolute;
+  bottom: -400px;
+  right: 150px;
+  transform: rotate(270deg)
+}
+.landing_right_text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  height: 200px;
+}
+.landing_right_title {
+  font-size: 40px;
+  font-weight: 900;
+  font-family: 'Roboto', sans-serif; 
+}
+.landing_right_players { 
+  font-size: 20px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 900;
+  display: flex;
+  justify-content: space-between;
+  width: 300px; 
+}
+.landing_right_link {
+  text-decoration: none;
+}
+.landing_right_players div{
+  color: black;
+}
