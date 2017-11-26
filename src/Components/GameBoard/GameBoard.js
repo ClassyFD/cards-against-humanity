@@ -4,10 +4,10 @@ import './GameBoard.css';
 
 class GameBoard extends Component {
   componentDidMount() {
-
+    console.log(this.props)
   }
-  componentWillReceiveProps() {
-
+  componentWillReceiveProps(props) {
+    console.log(props)
   }
   render() {
     let players;

@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { TimelineMax, Power4, Elastic } from 'gsap';
+import { TimelineMax, Power4} from 'gsap';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import getCards from '../FunctionalComponents/getCards/getCards';
 import GameBoard from '../GameBoard/GameBoard';
+import axios from 'axios';
 import './Landing.css';
 
 class Landing extends Component {
@@ -11,10 +12,25 @@ class Landing extends Component {
     super(props);
     this.state = {
       whiteCardArr:null,
-      blackCardArr:null
+      blackCardArr:null,
+      loggedIn:false
     }
   }
   componentDidMount() {
+    const api = axios.create({
+      withCredentials:true
+    });
+    api.get('http://localhost:3001/auth/me').then((response)=>{
+        this.setState({
+          loggedIn:true
+        })
+        this.props.dispatch({
+          type:'SET_USER',
+          val:response.data
+        })
+    }).catch((error)=>{
+      console.log(error)
+    })
     let cards = getCards();
     let blackCardArr=[cards.blackCards[12], cards.blackCards[64], cards.blackCards[63]];
     let whiteCardArr=[
@@ -26,6 +42,9 @@ class Landing extends Component {
       whiteCardArr,
       blackCardArr
     })
+    let ltl = new TimelineMax();
+    ltl.from('.landing_main', 1, {opacity:0})
+
     let tl = new TimelineMax();
     tl.staggerFrom('.landing_title div', .5, {marginLeft:'100vw', ease: Power4.easeOut}, .3)
     .to('.landing_subtitle', 1, {opacity: 1}, '+=.3');
@@ -89,7 +108,7 @@ class Landing extends Component {
     loadCards() {
       return this.state.blackCardArr.map((e, i)=>{
         return (
-          <section id={'landing_black_card_' + (i+1)} className='black_card'>
+          <section key={i} id={'landing_black_card_' + (i+1)} className='black_card'>
           <div className='question_text'>{e.text}</div>
           <div className='bottom_card_div'>
             <div className='icon_section'>
@@ -105,7 +124,7 @@ class Landing extends Component {
   loadWhiteCards() {
     return this.state.whiteCardArr.map((e, i)=>{
       return (
-        <section id={'landing_white_card_' + (i+1)} className='white_card'>
+        <section key={i} id={'landing_white_card_' + (i+1)} className='white_card'>
         <div className='question_text'>{e}</div>
         <div className='white_bottom_card_div'>
             <div className='book_icon'/>
@@ -123,13 +142,50 @@ class Landing extends Component {
   }
   linkMouseEnter(e) {
     let tl = new TimelineMax();
-    tl.to(e.target, .5, {textShadow:'1px 1px 5px red'})
+    tl.to(e.target, .3, {color: 'black'})
   }
   linkMouseLeave(e) {
     let tl = new TimelineMax();
-    tl.to(e.target, .5, {textShadow:'none'})
+    tl.to(e.target, .3, {color: '#565656'})
+  }
+  changePage(e) {
+    e.preventDefault();
+    let goTo = e.target.getAttribute('href');
+    let tl = new TimelineMax({
+      onComplete: () => {
+        this.props.history.push(goTo);
+      }
+    });
+    tl.to('.landing_main', 1, {opacity:0})
   }
   render() {
+    let user,
+        profilePicture;
+    if (this.props && this.props.user) {
+      console.log(this.props.user);
+          user = this.props.user,
+          profilePicture = user.picture;
+    }
+    let startGame = this.state.loggedIn? (
+      <div className='landing_right_text'> 
+        <Link to='/Profile' onClick={(e)=>{this.changePage(e)}} style={{background: 'url("' + profilePicture + '") no-repeat center center'}} className='landing-right-profile'/>
+        <div className='landing_right_title'>How Many Are Playing?</div>
+        <div className='landing_right_players'>
+          <div onMouseEnter={(e)=>this.linkMouseEnter(e)} onMouseLeave={(e)=>{this.linkMouseLeave(e)}} onClick={(e)=>{this.updatePlayers(3)}}><Link to='/Board' onClick={(e)=>{this.changePage(e)}} className='landing_right_link'>3 players</Link></div>
+          <div onMouseEnter={(e)=>this.linkMouseEnter(e)} onMouseLeave={(e)=>{this.linkMouseLeave(e)}} onClick={(e)=>{this.updatePlayers(4)}}><Link to='/Board' onClick={(e)=>{this.changePage(e)}} className='landing_right_link'>4 players</Link></div>
+          <div onMouseEnter={(e)=>this.linkMouseEnter(e)} onMouseLeave={(e)=>{this.linkMouseLeave(e)}} onClick={(e)=>{this.updatePlayers(5)}}><Link to='/Board' onClick={(e)=>{this.changePage(e)}} className='landing_right_link'>5 players</Link></div>
+        </div>
+      </div>
+    ) : (
+      <div className='landing-log-in'>
+        <div className='landing-please-log-in-text'>
+          Please log in to start playing!
+        </div>
+        <a href={'http://localhost:3001/auth'} className='landing-log-in-button'>
+          Log In
+        </a>
+      </div>
+    )
     return (
       <main className='landing_main'>
         <section className='landing_section'>
@@ -142,14 +198,7 @@ class Landing extends Component {
             <div className='landing_subtitle'> A Party Game <br/> for horrible people. </div>
           </container>
           <container className='landing_right_container'>
-            <div className='landing_right_text'> 
-              <div className='landing_right_title'>How Many Are Playing?</div>
-              <div className='landing_right_players'>
-                <Link onMouseEnter={(e)=>this.linkMouseEnter(e)} onMouseLeave={(e)=>{this.linkMouseLeave(e)}} className='landing_right_link' to='/Board' component={GameBoard}><div onClick={(e)=>{this.updatePlayers(3)}}>3 players</div></Link>
-                <Link onMouseEnter={(e)=>this.linkMouseEnter(e)} onMouseLeave={(e)=>{this.linkMouseLeave(e)}} className='landing_right_link' to='/Board' component={GameBoard}><div onClick={(e)=>{this.updatePlayers(4)}}>4 players</div></Link>
-                <Link onMouseEnter={(e)=>this.linkMouseEnter(e)} onMouseLeave={(e)=>{this.linkMouseLeave(e)}} className='landing_right_link' to='/Board' component={GameBoard}><div onClick={(e)=>{this.updatePlayers(5)}}>5 players</div></Link>
-              </div>
-            </div>
+            {startGame}
             {this.state.blackCardArr? this.loadCards():'loading...'}
             {this.state.whiteCardArr? this.loadWhiteCards():'loading...'}
           </container>
@@ -158,4 +207,9 @@ class Landing extends Component {
     )
   }
 }
-export default connect()(Landing);
+function mapStateToProps(state) {
+  return {
+    user: state.user,
+  }
+}
+export default connect(mapStateToProps)(Landing);
